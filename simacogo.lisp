@@ -131,13 +131,15 @@
                    (generate-children board player-white))
           (list best-column best-value))))))
 
-
+; receives user input to drop a piece on the board
 (defun player-turn (board player)
   (format t "Enter a column to drop a piece (1 - ~A): " columns-count)
   (let ((input-column (read)))
     (if (equal (drop-piece board player (- input-column 1)) nil)
         (player-turn board player))))
 
+; main game loop repeats until all moves are up
+; then prints the winner
 (defun game-loop (board)
   (let ((current-player player-white))
     (dotimes (current-move moves-count)
@@ -152,18 +154,20 @@
           (format t "AI's turn~%")
           (drop-piece board player-black (first (minimax board num-plys t)))
           (setf current-player player-white))))
-    (format t "~%~%_____FINAL SCORES_____~%~%")
-    (format t "Black: ~a ~%White: ~a~%~%" (get-score board player-black) (get-score board player-white))
-    (print-board board)
-    (if (> (get-score board player-black) (get-score board player-white))
-        (format t "!!! BLACK WINS !!!~%")
-      (format t "!!! WHITE WINS !!!~%"))))
+    (let ((final-score-black (get-score board player-black)) (final-score-white (get-score board player-white)))
+      (format t "~%~%_____FINAL SCORES_____~%~%")
+      (format t "Black: ~a ~%White: ~a~%~%" final-score-black final-score-white)
+      (print-board board)
+      (cond
+       ((> final-score-black final-score-white) (format t "!!! BLACK WINS !!!~%"))
+       ((< final-score-black final-score-white) (format t "!!! WHITE WINS !!!~%"))
+       (t (format t "!!! TIE !!!~%"))))))
           
-
+; start a game!
 (defun start ()
   (princ "Number of plys: ")
   (setf num-plys (read))
-  (print num-plys))
+  (game-loop (copy-tree initial-board))) ; pass a copy of the board so we don't wreck it
    
    
    
